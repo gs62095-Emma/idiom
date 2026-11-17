@@ -1,4 +1,27 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#14110c"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="成語功夫學院"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png"></head><body><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html><html lang="zh-Hant"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#14110c"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="成語功夫學院"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png"></head><body>
+<script>
+/* ===== 學校 Wi-Fi 閘門：由管理員在「國小跨校智慧教學網站」後台指定的學校網路才能使用；離開學校網路超過 12 小時會自動鎖住 ===== */
+(function(){
+var GATE='https://school-site-anim.gs62095.workers.dev/api/gate',K='cy_gate_lease',ov=null,mem=null;
+function get(){try{var v=localStorage.getItem(K);if(v)return JSON.parse(v)}catch(e){}return mem}
+function put(o){mem=o;try{localStorage.setItem(K,JSON.stringify(o))}catch(e){}}
+function lock(msg){if(!ov){ov=document.createElement('div');ov.id='cyGate';ov.style.cssText='position:fixed;inset:0;z-index:2147483647;background:#fff7e8;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font:20px/1.7 sans-serif;color:#5a3a12';document.documentElement.appendChild(ov)}
+ov.innerHTML='<div style="max-width:520px"><div style="font-size:56px">\u{1F512}</div><b style="font-size:26px">\u6210\u8a9e\u529f\u592b\u5b78\u9662</b><p></p><div id="cyMsg"></div><p><button id="cyRe" style="font-size:20px;padding:10px 26px;border-radius:14px;border:0;background:#f5a623;color:#fff">\u91cd\u65b0\u6aa2\u67e5</button></p></div>';
+ov.querySelector('#cyMsg').textContent=msg;ov.querySelector('#cyRe').onclick=check}
+function unlock(){if(ov){ov.remove();ov=null}}
+function check(){var done=false;
+fetch(GATE,{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){done=true;
+ if(!j.enforce){put({at:Date.now(),enforce:false,hours:j.hours||12});unlock();return}
+ if(j.ok){put({at:Date.now(),enforce:true,hours:j.hours||12});unlock();return}
+ lock('\u9019\u53f0\u88dd\u7f6e\u76ee\u524d\u4e0d\u5728\u5b78\u6821\u6307\u5b9a\u7684 Wi-Fi\uff0c\u8acb\u9023\u4e0a\u5b78\u6821\u7db2\u8def\u5f8c\u518d\u4f7f\u7528\u3002')
+}).catch(function(){var L=get();
+ if(!L)return lock('\u7b2c\u4e00\u6b21\u4f7f\u7528\u9700\u8981\u9023\u4e0a\u5b78\u6821 Wi-Fi \u4e26\u6aa2\u67e5\u3002');
+ if(L.enforce&&Date.now()-L.at>(L.hours||12)*36e5)lock('\u96e2\u958b\u5b78\u6821\u7db2\u8def\u592a\u4e45\u4e86\uff0c\u5df2\u81ea\u52d5\u9396\u4f4f\u3002\u8acb\u56de\u5230\u5b78\u6821 Wi-Fi \u5f8c\u91cd\u65b0\u6aa2\u67e5\u3002')})}
+if(!get())lock('\u6b63\u5728\u6aa2\u67e5\u5b78\u6821\u7db2\u8def\u2026');
+check();setInterval(check,300000);window.addEventListener('online',check);document.addEventListener('visibilitychange',function(){if(!document.hidden)check()});
+})();
+</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>成語功夫學院</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
