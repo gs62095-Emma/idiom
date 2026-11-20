@@ -134,7 +134,7 @@ mark.idm{color:var(--seal);background:none}
 .rk{display:grid;grid-template-columns:34px 48px 1fr auto;gap:8px;align-items:center;padding:6px 8px;border-radius:12px;border:2px solid transparent}
 .rk.me{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 16%,var(--card))}
 .rk .no{font-weight:900;font-size:1.3rem;text-align:center}.rs{text-align:right;line-height:1.4}
-.belts{display:flex;gap:6px;flex-wrap:wrap}
+.belts{display:grid;gap:6px;grid-template-columns:repeat(auto-fill,minmax(66px,1fr))}
 .bl{display:grid;justify-items:center;gap:2px;text-align:center;opacity:.4;flex:1;min-width:52px;line-height:1.2}
 .bl.on{opacity:1}.bl i{display:block;width:100%;height:14px;border-radius:4px;border:2px solid rgba(0,0,0,.4)}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
@@ -874,11 +874,13 @@ const COMICS=[
 const CKEY=c=>`${c.g}-${c.l}`;
 /* ===== 原創 Q 版功夫熊貓(綁頭帶、功夫裝);頭帶顏色=目前腰帶顏色 ===== */
 const BELTS=[
- {n:'白帶',xp:0,c:'#f4f1e8'},{n:'黃帶',xp:100,c:'#f2c230'},{n:'橘帶',xp:260,c:'#ee8a2c'},{n:'綠帶',xp:480,c:'#3fa75a'},
- {n:'藍帶',xp:760,c:'#3b82d6'},{n:'紫帶',xp:1100,c:'#8a56c8'},{n:'棕帶',xp:1500,c:'#8a5a32'},{n:'紅帶',xp:2000,c:'#d6382d'},{n:'黑帶',xp:2600,c:'#1c1c1c'}];
+ {n:'白帶',xp:0,c:'#f4f1e8'},{n:'黃帶',xp:150,c:'#f2c230'},{n:'橘帶',xp:390,c:'#ee8a2c'},{n:'綠帶',xp:720,c:'#3fa75a'},
+ {n:'藍帶',xp:1140,c:'#3b82d6'},{n:'紫帶',xp:1650,c:'#8a56c8'},{n:'棕帶',xp:2250,c:'#8a5a32'},{n:'紅帶',xp:3000,c:'#d6382d'},{n:'黑帶',xp:4000,c:'#1c1c1c'},
+ {n:'黑帶二段',xp:5000,c:'#2f2f3f'},{n:'黑帶三段',xp:6200,c:'#3a3560'},{n:'黑帶四段',xp:7600,c:'#4b2f78'},{n:'黑帶五段',xp:9200,c:'#6b1f6e'},
+ {n:'銀帶宗師',xp:11000,c:'#b8c2cc'},{n:'金帶宗師',xp:13000,c:'#e6b422'},{n:'武林傳說',xp:15200,c:'#c8321e'},{n:'成語大俠',xp:17700,c:'#12929e'},{n:'成語聖者',xp:20500,c:'#7a3cff'},{n:'成語之神',xp:24000,c:'#ff8a00'}];
 const beltOf=xp=>{let i=0;BELTS.forEach((b,k)=>{if(xp>=b.xp)i=k});return i};
 function pandaSvg(mood,belt,size){
-  const c=(BELTS[belt]||BELTS[0]).c,m=mood||'happy',dk=belt===8?'#555':'rgba(0,0,0,.25)';
+  const c=(BELTS[belt]||BELTS[0]).c,m=mood||'happy',dk=belt>=8?'#555':'rgba(0,0,0,.25)';
   const eyes=m==='sad'?`<path d="M72 88q6 -5 12 0M116 88q6 -5 12 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>`
    :m==='cheer'?`<path d="M72 90q6 -9 12 0M116 90q6 -9 12 0" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round"/>`
    :`<circle cx="78" cy="88" r="6" fill="#fff"/><circle cx="122" cy="88" r="6" fill="#fff"/><circle cx="79" cy="89" r="3" fill="#111"/><circle cx="123" cy="89" r="3" fill="#111"/>`;
@@ -929,7 +931,7 @@ const pick=(a,n)=>shuffle(a).slice(0,n);
 const DAY=864e5,INT=[0,1,2,3,7,14];
 const mem={};
 const store={get(k,d){try{const v=localStorage.getItem(k);if(v!=null)return JSON.parse(v)}catch(e){}return k in mem?mem[k]:d},set(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-const newP=nick=>({id:Date.now().toString(36)+rnd(999),nick:nick||'',grade:4,les:0,diff:2,zy:true,xp:0,m:{},log:[],bestCombo:0,wins:0,bestChain:0,done:{},sh:{},cread:{},cdone:{},wb:{},seen:0,day:{},tr:{}});
+const newP=nick=>({id:Date.now().toString(36)+rnd(999),nick:nick||'',grade:4,les:0,diff:2,zy:true,xp:0,lv:0,v66:1,m:{},log:[],bestCombo:0,wins:0,bestChain:0,done:{},sh:{},cread:{},cdone:{},wb:{},seen:0,day:{},tr:{}});
 let ALL=store.get('cy2_all',null)||{cur:0,ps:[]};
 if(!ALL.ps.length)ALL={cur:0,ps:[]};
 let S=ALL.ps[ALL.cur]||newP('');
@@ -1053,12 +1055,12 @@ function bar(a,b){return `<div class="prog" role="progressbar" aria-valuenow="${
 function back(to,label){if(to==='home'&&label==='道場'){to='dojo';label='道館'}return `<button class="btn ghost" data-a="go" data-v="${to}">← ${label||'返回'}</button>`}
 function speak(t){try{if(window.TTS){TTS.speak(t,{language:'zh-TW'}).catch(()=>{});return}}catch(e){}try{const u=new SpeechSynthesisUtterance(t);u.lang='zh-TW';speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
 const canSpeak=()=>!!(window.TTS||window.speechSynthesis);
-const belt=()=>beltOf(S.xp);
+const belt=()=>Math.min(BELTS.length-1,S.lv||0);
 const kc=(w,t)=>[...t].map(c=>w.includes(c)?`<b class="kc">${esc(c)}</b>`:esc(c)).join('');
 function pic(src,ph,cls){return `<div class="idimg ${cls||''}"><img src="${src}" alt="圖卡" data-ph="${esc(ph||'🖼️')}"></div>`}
 const idImg=(w,cls)=>pic(`img/${IID[w]}.png`,RICH[w]?RICH[w].emo:'🖼️',cls);
 document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.dataset.ph!=null){const d=document.createElement('div');d.className='imgph';d.innerHTML=`<span>${t.dataset.ph}</span><small>圖卡準備中</small>`;t.replaceWith(d)}},true);
-function addXP(n){const b0=belt();S.xp+=n;const b1=belt();if(b1>b0)UPMSG=`🎉 升級了!你現在是「${BELTS[b1].n}」,頭帶換色囉!`;save()}
+function addXP(n){const nx=BELTS[belt()+1],el0=nx&&S.xp>=nx.xp;S.xp+=n;if(nx&&!el0&&S.xp>=nx.xp)UPMSG=`⚔ XP 夠了!可以去挑戰「${nx.n}」升等考驗,通過五關再打敗大魔王就能升等!`;save()}
 const takeUp=()=>{const u=UPMSG;UPMSG='';return u?`<div class="notice up">${u}</div>`:''};
 function xpBar(){const b=belt(),nx=BELTS[b+1];if(!nx)return `<div class="small mute">已經是黑帶大師!XP ${S.xp}</div>`;const a=S.xp-BELTS[b].xp,t=nx.xp-BELTS[b].xp;return `${bar(a,t)}<div class="small mute">再 ${nx.xp-S.xp} XP 升${nx.n}</div>`}
 function head(){
@@ -1411,7 +1413,7 @@ VIEWS.hero=function(){
   const ps=ALL.ps.slice().sort((a,b)=>b.xp-a.xp);
   const mine=S;
   return `<div class="row"><h2>🏆 英雄榜</h2></div><p class="mute small" style="margin:0">這是這台裝置上所有學生的排行。靠答對累積 XP,不比誰答得快。</p>
-  <section class="card"><div class="rank">${ps.length?ps.map((p,i)=>{const b=beltOf(p.xp);return `<div class="rk ${p===S?'me':''}"><span class="no">${['🥇','🥈','🥉'][i]||i+1}</span><span class="rp">${panda('happy',b,44)}</span><div class="rt"><b>${esc(p.nick)}</b><div class="small mute">${BELTS[b].n} · ${p.xp} XP</div></div><div class="small rs">擂台勝 ${p.wins}<br>最高連擊 ${p.bestCombo}<br>最佳接龍 ${p.bestChain}</div></div>`}).join(''):'<p>還沒有人上榜。</p>'}</div></section>
+  <section class="card"><div class="rank">${ps.length?ps.map((p,i)=>{const b=Math.min(BELTS.length-1,p.lv||0);return `<div class="rk ${p===S?'me':''}"><span class="no">${['🥇','🥈','🥉'][i]||i+1}</span><span class="rp">${panda('happy',b,44)}</span><div class="rt"><b>${esc(p.nick)}</b><div class="small mute">${BELTS[b].n} · ${p.xp} XP</div></div><div class="small rs">擂台勝 ${p.wins}<br>最高連擊 ${p.bestCombo}<br>最佳接龍 ${p.bestChain}</div></div>`}).join(''):'<p>還沒有人上榜。</p>'}</div></section>
   <section class="card"><h3>我的腰帶之路</h3><div class="belts">${BELTS.map((b,i)=>`<div class="bl ${belt()>=i?'on':''}"><i style="background:${b.c}"></i><small>${b.n}<br>${b.xp}</small></div>`).join('')}</div>${xpBar()}
   <p class="small mute">熟練成語 ${W.filter(mastered).length}/${W.length} · 讀完漫畫 ${Object.keys(S.cread).length}/${COMICS.length} · 漫畫填空 ${Object.keys(S.cdone).length}/${COMICS.length} · 完成拖拉機 ${Object.keys(S.done).length}/${ARTS.length} 篇 · 記住縮縮說 ${Object.keys(S.sh).length}/${W.length} 個</p></section>`;
 };
@@ -4071,6 +4073,91 @@ VIEWS.teacher=function(){
   const h=TV64();if(!TU)return h;
   const k='<section class="card q"><div class="row" style="justify-content:space-between"><h3>我的題組';
   return h.replace(k,`<section class="card q tch" style="border-color:var(--gold)"><div class="row" style="justify-content:space-between"><h3>📝 每週學習記錄單</h3><button class="btn" data-a="go" data-v="tlog">產生記錄單</button></div><p class="small mute" style="margin:0">週一到週五的記錄單:4 個學習區、每天打勾與分數格、成語清單、自評、目標獎勵、簽名欄。可列印或下載 Word。</p></section>`+k);
+};
+
+
+/* ===== v66:黑帶後 10 級 + 升等五關挑戰 + 大魔王 ===== */
+const OLDB=[0,100,260,480,760,1100,1500,2000,2600];
+ALL.ps.concat([S]).forEach(p=>{if(!p.v66){let k=0;OLDB.forEach((x,i)=>{if((p.xp||0)>=x)k=i});p.oldXp=p.xp||0;p.oldLv=k;p.xp=0;p.lv=0;p.pr=null;p.v66=1}p.lv=p.lv||0});
+if(ALL.ps.length)store.set('cy2_all',ALL);
+const PBOSS=[['🐭','見習小魔王'],['🦝','偷懶浣熊'],['🐗','野豬將軍'],['🦂','毒蠍刺客'],['🐊','沼澤鱷王'],['🦅','暗影鷹王'],['🐺','月夜狼王'],['🦍','金剛拳王'],['🐉','黑帶龍王'],
+ ['👺','天狗魔君'],['🧛','暗夜伯爵'],['🧟','不死軍團長'],['👹','赤鬼大王'],['🦑','深海巨怪'],['🐲','烈焰古龍'],['👾','異界魔神'],['🌪️','混沌風暴'],['😈','成語大魔王']];
+const PSTG=[
+ {n:'選擇關',e:'🎯',k:['mean','word','syn','ant','pick'],d:2,t:'選意思、選成語'},
+ {n:'填空關',e:'✏️',k:['cloze','build'],d:2,t:'句子填成語、拼成語'},
+ {n:'用字關',e:'🔤',k:['spell','err','build'],d:3,t:'找錯字、選正確寫法'},
+ {n:'接龍關',e:'🔗',k:['shuo','shuo2'],d:3,t:'縮縮說配成語'},
+ {n:'綜合關',e:'🌀',k:null,d:3,t:'所有題型混合'}];
+const PN=10,PPASS=9,BHEARTS=5,BPER=3,PHP=3,BMAX=20;
+function pElig(){const nx=BELTS[belt()+1];return !!nx&&S.xp>=nx.xp}
+function pScope(){const a=[];for(let g=4;g<=Math.max(4,S.grade);g++)Object.values(LES[g]||{}).forEach(l=>l.forEach(w=>{if(!a.includes(w)&&D[w])a.push(w)}));return a}
+function pGen(st){
+  const ws=pScope(),k=PSTG[st]?PSTG[st].k:null,d=st>=5?3:PSTG[st].d,g=genFrom(ws,k,d);let used=[];
+  return()=>{let q;for(let t=0;t<12;t++){q=g();if(!used.includes(q.w)){break}}used.push(q.w);if(used.length>ws.length-2)used=[];return q}
+}
+function pBoss(){return PBOSS[Math.min(PBOSS.length-1,belt())]}
+VIEWS.promo=function(){
+  const nx=BELTS[belt()+1];if(!nx)return `<div class="row">${back('home','道場')}<h2>⚔ 升等考驗</h2></div><section class="card"><p>你已經是「${BELTS[belt()].n}」,是最高等級!</p></section>`;
+  const cl=(S.pr&&S.pr.t===belt()+1)?S.pr.s:0,bs=pBoss();
+  if(!pElig())return `<div class="row">${back('home','道場')}<h2>⚔ 升等考驗</h2></div><section class="card"><p>想升「<b>${nx.n}</b>」要先累積到 <b>${nx.xp}</b> XP 才有資格挑戰。</p>${xpBar()}</section>`;
+  return `<div class="row">${back('home','道場')}<h2>⚔ 升等考驗:${nx.n}</h2></div>
+  <section class="card q"><div class="row"><span class="beltchip" style="--bc:${nx.c}">${nx.n}</span><span class="pill y">${bs[0]} ${bs[1]}</span></div>
+  <p style="margin:4px 0">先通過 <b>5 關</b>,再打敗大魔王,才能升等!</p>
+  <div class="stones" style="display:grid;gap:6px">${PSTG.map((x,i)=>`<div class="rk ${i===cl?'me':''}"><span class="no">${i<cl?'✅':x.e}</span><div class="rt"><b>第 ${i+1} 關:${x.n}</b><div class="small mute">${x.t}</div></div></div>`).join('')}
+  <div class="rk ${cl>=5?'me':''}"><span class="no">${bs[0]}</span><div class="rt"><b>大魔王:${bs[1]}</b><div class="small mute">魔王有 ${BHEARTS} 顆愛心,你答對 ${BPER} 題打掉 1 顆;你有 ${PHP} 顆愛心,答錯 ${PHP} 題就輸。最多 ${BMAX} 題。</div></div></div></div>
+  <p class="small mute" style="margin:6px 0 0">每一小關 ${PN} 題,答對 ${PPASS} 題以上過關(錯 2 題就失敗)。失敗只要重打那一關,題目會重新抽。已通過的關卡會保留。</p>
+  <button class="btn big" data-a="promoGo">${cl>=5?'⚔ 挑戰大魔王':cl?`▶ 繼續第 ${cl+1} 關`:'▶ 開始第 1 關'}</button></section>`;
+};
+function pStart(){
+  const t=belt()+1;if(!S.pr||S.pr.t!==t)S.pr={t,s:0};const st=S.pr.s,boss=st>=5;
+  const P={t,st,boss,n:0,ok:0,hp:PHP,bh:BHEARTS};
+  startRun({title:boss?`大魔王:${pBoss()[1]}`:`升等考驗 第 ${st+1} 關:${PSTG[st].n}`,src:'promo',gen:pGen(boss?5:st),promo:P,topH:()=>pTop(P)});
+}
+function pTop(P){
+  const bs=pBoss(),hearts=n=>[...Array(n)].map((_,i)=>i<n?'❤️':'').join('');
+  if(P.boss)return `<section class="card arena"><div class="ar-row"><div class="fighter">${panda(P.hp<PHP?'think':'happy',belt(),72)}<div class="hearts">${[...Array(PHP)].map((_,i)=>i<P.hp?'❤️':'🖤').join('')}</div></div><div class="vs">VS</div><div class="fighter foe"><div class="foe-e">${bs[0]}</div><b>${bs[1]}</b><div class="hearts">${[...Array(BHEARTS)].map((_,i)=>i<P.bh?'💜':'🤍').join('')}</div></div></div><div class="small mute">答對 ${P.ok} 題 · 每 ${BPER} 題打掉魔王 1 顆愛心 · 第 ${P.n+(RUN&&(RUN.pick!==-1||RUN.builtDone)?0:1)}/${BMAX} 題</div></section>`;
+  return `<section class="card"><div class="row" style="justify-content:space-between"><span class="beltchip" style="--bc:${BELTS[P.t].c}">第 ${P.st+1}/5 關 ${PSTG[P.st].e}</span><b>${P.ok}/${PN} 對</b><span class="pill ${P.n-P.ok>=1?'r':'g'}">錯 ${P.n-P.ok}/2</span></div>${bar(P.n,PN)}</section>`;
+}
+ACT.promoGo=()=>{if(!pElig())return go('promo');pStart()};
+const _ans66=answer;
+answer=function(q,ok,ci){const P=RUN&&RUN.promo;if(P){P.n++;if(ok){P.ok++;if(P.boss&&P.ok%BPER===0&&P.bh>0)P.bh--}else if(P.boss)P.hp--;}_ans66(q,ok,ci)};
+const _next66=ACT.next;
+ACT.next=function(){
+  const P=RUN&&RUN.promo;if(!P)return _next66();
+  clearTM();
+  if(P.boss){
+    if(P.bh<=0)return pWin();
+    if(P.hp<=0||P.n>=BMAX)return pFail(`大魔王太強了…你答對了 ${P.ok} 題。`);
+  }else{
+    if(P.n-P.ok>=2)return pFail(`這一關錯了 2 題,沒有過關。`);
+    if(P.n>=PN){if(P.ok>=PPASS)return pPass(P);return pFail(`答對 ${P.ok}/${PN} 題,差一點!`)}
+  }
+  RUN.i++;RUN.pick=-1;RUN.built=[];RUN.builtDone=0;RUN.last=null;RUN.timedOut=0;RUN.qt0=0;render();
+};
+function pPass(P){
+  RUN=null;S.pr={t:P.t,s:P.st+1};addXP(10);save();
+  const last=P.st===4;
+  resultView({title:`🎉 第 ${P.st+1} 關通過!`,mood:'cheer',lines:[`答對 <b>${P.ok}/${PN}</b> 題`,last?'五關全部通過!最後,大魔王出現了…':`下一關:${PSTG[P.st+1].n}`],msg:'',btns:[{t:last?'⚔ 挑戰大魔王':'▶ 下一關',a:'promoGo'},{t:'先回道館',a:'go',d:{v:'dojo'},c:'ghost'}]});
+}
+function pFail(msg){
+  const P=RUN.promo,boss=P.boss;RUN=null;addXP(2);save();
+  resultView({title:boss?'敗給大魔王了…':'這一關沒過',mood:'sad',lines:[msg,boss?'重新打大魔王,題目會重新抽。前面五關保留。':'重打這一關,題目會重新抽。前面通過的關卡保留。'],msg:'去「修練」或「破綻簿」補強再來,下一次一定可以!',btns:[{t:'🔁 再挑戰一次',a:'promoGo'},{t:'回道館',a:'go',d:{v:'dojo'},c:'ghost'}]});
+}
+function pWin(){
+  const P=RUN.promo,t=P.t,nb=BELTS[t];RUN=null;S.lv=t;S.pr=null;S.wins=(S.wins||0)+1;addXP(30);
+  UPMSG=`🎉 升等成功!你現在是「${nb.n}」!`;save();
+  resultView({title:`🏆 打敗大魔王!升為「${nb.n}」`,mood:'cheer',lines:[`答對 <b>${P.ok}</b> 題`,pElig()?'你的 XP 已經夠挑戰下一級了!':`下一級再累積 ${BELTS[t+1]?BELTS[t+1].xp-S.xp:0} XP`],msg:'頭帶換色囉!',btns:[{t:'回道館',a:'go',d:{v:'dojo'}}]});
+}
+/* xpBar 與首頁入口 */
+xpBar=function(){
+  const b=belt(),nx=BELTS[b+1];if(!nx)return `<div class="small mute">已經是最高等級「${BELTS[b].n}」!XP ${S.xp}</div>`;
+  if(pElig())return `<div class="small" style="font-weight:800">XP ${S.xp},夠了!</div><button class="btn" data-a="go" data-v="promo">⚔ 挑戰「${nx.n}」升等考驗</button>`;
+  const a=Math.max(0,S.xp-BELTS[b].xp),t=nx.xp-BELTS[b].xp;return `${bar(a,t)}<div class="small mute">再 ${nx.xp-S.xp} XP 就能挑戰「${nx.n}」升等考驗</div>`;
+};
+const H66=VIEWS.home;
+VIEWS.home=function(){
+  const h=H66();if(!S.nick||!pElig())return h;const nx=BELTS[belt()+1],cl=(S.pr&&S.pr.t===belt()+1)?S.pr.s:0;
+  return h.replace('<div class="trail">',`<section class="card" style="border-color:var(--gold)"><div class="row" style="justify-content:space-between"><b>⚔ 可以挑戰「${nx.n}」升等考驗!</b><button class="btn" data-a="go" data-v="promo">${cl?'繼續挑戰':'去挑戰'}</button></div><p class="small mute" style="margin:0">五關 + 大魔王${cl?`(已過 ${Math.min(cl,5)} 關)`:''}</p></section><div class="trail">`);
 };
 
 render();
