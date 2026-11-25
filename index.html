@@ -4331,6 +4331,33 @@ VIEWS.card=function(){
 };
 ACT.cardGo=d=>{const b=V.back||'study';ACT.idiom({w:d.w});V.back=b;render();try{window.scrollTo(0,0)}catch(e){}};
 
+
+/* ===== v77:學生自選年級、課別,學習與小測驗對應 ===== */
+const _pc77=progCard;
+progCard=function(){
+  const h=_pc77(),a='\n  <div style="display:grid;gap:8px">';
+  const sc=`<div style="margin:8px 0"><b class="small">我要學的範圍</b>${scopeUI('prog')}<p class="small mute" style="margin:0">選好年級和課別,學習和小測驗都會用這個範圍。</p></div>`;
+  return h.indexOf(a)<0?h:h.replace(a,'\n  '+sc+'<div style="display:grid;gap:8px">');
+};
+const comicWords0=comicWords;
+comicWords=function(){
+  if(!S.les)return comicWords0();
+  const out=[];COMICS.filter(c=>c.g===S.grade&&c.l===S.les).forEach(c=>c.p.forEach(p=>{(p[0].match(/\{([^}]+)\}/g)||[]).forEach(x=>{const w=x.slice(1,-1);if(D[w]&&!out.includes(w))out.push(w)})}));
+  return out.length>=3?out:comicWords0();
+};
+const _st77=VIEWS.study;
+VIEWS.study=function(){
+  let h=_st77();
+  const m=h.match(/<div class="tabs">(?:(?!<\/div>).)*<\/div>/s);
+  if(m)h=h.replace(m[0],scopeUI('study'));
+  if(S.les){
+    const parts=h.split('<section class="card isle">'),keep=`第 ${S.les} 課</h3>`;
+    h=parts[0]+parts.slice(1).filter(p=>p.includes(keep)).map(p=>'<section class="card isle">'+p).join('');
+    h+=`<p class="small mute">目前只顯示你選的範圍。想看整個${GR[S.grade]},把上面的「範圍」改成「整個${GR[S.grade]}」。</p>`;
+  }
+  return h;
+};
+
 render();
 (async()=>{try{if(window.claude&&claude.use){const t=await claude.use('tts');if(t)window.TTS=t}}catch(e){}})();
 </script>
