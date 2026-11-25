@@ -643,10 +643,10 @@ const MN={
 '守株待兔':['株=樹樁(樹砍掉後留下的部分);守在樹樁旁,等兔子再來撞','守著樹,等兔子,菜都乾了!','守著樹幹,等兔子送上門','A farmer yawning under a tree stump waiting for a rabbit, his field behind him full of withered crops'],
 '天衣無縫':['天衣=仙女穿的衣服;仙女的衣服,找不到一條縫線','仙衣一件,找不到縫!','天衣沒縫,找不到破綻','A floating sparkling seamless fairy robe, panda with a magnifying glass finding no seam'],
 '螳螂捕蟬':['捕=抓;螳螂抓蟬,卻不知道黃雀在背後要抓牠','螳螂盯蟬,背後有鳥!','螳螂只盯蟬,不看背後','A mantis about to catch a cicada while a small bird behind the mantis is about to catch it'],
-'海底撈針':['撈=從水裡取東西;到大海底下找一根小小的針','一根針掉大海,撈得到嗎?','到海底撈針,幾乎找不到','A panda in a diving mask at the sea bottom holding a net, searching among seaweed for a tiny needle, fish laughing'],
+'海底撈針':['撈=從水裡取東西;到大海底下找一根小小的針','一根針掉大海,撈得到嗎?','像在大海裡找一根針,幾乎找不到','A panda in a diving mask at the sea bottom holding a net, searching among seaweed for a tiny needle, fish laughing'],
 '同流合污':['流=風氣,污=骯髒;跟著壞風氣走,一起變骯髒','跟著髒水流,變髒兮兮!','跟著髒水流,一起學壞','A panda being pulled into a muddy dirty stream by a fox gang, holding his nose; clean river separate'],
 '虎視眈眈':['視=看,眈眈=瞪著眼往下看;老虎瞪大眼睛,盯著獵物','老虎瞪大眼,盯著獵物!','像老虎瞪眼盯著想搶','Fox and duck boss staring greedily at a bun stall from behind a corner with tiger-like intense eyes'],
-'大刀闊斧':['闊=寬;拿著大刀和寬斧頭,用力砍下去','大刀寬斧,一揮就改!','大刀闊斧,果斷有魄力','A panda swinging a big broad axe chopping an old messy shop into a new shape, wood chips flying'],
+'大刀闊斧':['闊=寬;拿著大刀和寬斧頭,用力砍下去','大刀寬斧,一揮就改!','拿大刀寬斧去改,果斷有魄力','A panda swinging a big broad axe chopping an old messy shop into a new shape, wood chips flying'],
 '臥薪嘗膽':['臥=躺,薪=柴,嘗=舔;睡在柴堆上、舔苦苦的膽','睡柴堆,舔苦膽,不忘恥!','睡柴舔苦膽,不忘恥辱','A panda sleeping on firewood and licking a bitter jar with a sour face, determined eyes, training manuals nearby'],
 '破釜沉舟':['釜=煮飯的鍋子;打破飯鍋、弄沉渡船,沒有退路','鍋打破,船沉掉,沒退路!','砸鍋沉船,只能向前衝','A panda general smashing a cooking pot, a boat sinking in the river behind, soldiers cheering forward'],
 '鑽牛角尖':['牛角尖=牛角最尖細的地方;往牛角尖裡鑽,越鑽越窄','鑽進牛角尖,轉不出來!','鑽進牛角尖,轉不出來','A tiny panda stuck inside the pointy tip of a bull horn, dizzy and confused'],
@@ -1229,7 +1229,7 @@ VIEWS.card=function(){
 };
 ACT.say=()=>{const w=V.w,r=RICH[w];speak(w+'。字面上是:'+MN[w][0].replace(/=/g,'是').replace(/;/g,'。')+'。縮縮說:'+SH[w]+'。'+(r?r.story.join(''):'')+'意思是:'+D[w].m)};
 ACT.cardQuiz=()=>{const w=V.w,bk=V.back||'study';const qs=[mkQ(w,'shuo',2),mkQ(w,'cloze',2),KIND.build(w,1)];V.back=bk;
-  startRun({qs,title:`考考我:${w}`,src:'learn',onDone:res=>{const s=summary('考考我',res);addXP(s.ok*3);resultView(Object.assign(s,{title:s.ok===3?'全對!':'再接再厲',btns:[{t:'回成語卡',a:'card2',d:{w,b:bk}}]}))}})};
+  startRun({qs,title:'考考我',src:'learn',onDone:res=>{const s=summary('考考我',res);addXP(s.ok*3);resultView(Object.assign(s,{title:s.ok===3?'全對!':'再接再厲',btns:[{t:'回成語卡',a:'card2',d:{w,b:bk}}]}))}})};
 ACT.card2=d=>go('card',{w:d.w,back:d.b});
 /* ---------- 🐼 成語縮縮說 ---------- */
 VIEWS.shuo=function(){
