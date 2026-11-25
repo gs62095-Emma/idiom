@@ -3810,7 +3810,7 @@ let LACT=Date.now(),ZNOTE='';
 ['pointerdown','keydown','touchstart','scroll','mousemove'].forEach(ev=>addEventListener(ev,()=>{LACT=Date.now()},{passive:true,capture:true}));
 function zTick(){
   let el=document.getElementById('ztimer');if(!el){el=document.createElement('div');el.id='ztimer';el.setAttribute('role','status');document.body.appendChild(el)}
-  const z=S&&S.nick&&VZ[V.v];
+  const z=S&&S.nick&&(VZ[V.v]||(V.v==='run'&&RUN&&RUN.src==='shuo'&&!RUN.game?'shuo':null));
   if(!z){el.style.display='none';document.body.classList.remove('zt');return}
   const zz=ZONES.find(x=>x.id===z),R=RUL(),d=DL(),act=document.visibilityState==='visible'&&Date.now()-LACT<45000,b=d.t[z]||0;
   if(act){d.t[z]=b+1;if((b+1)%5===0)save();if(b+1===R.min*60){save();toast(`🎉 「${zz.n}」今天學滿 ${R.min} 分鐘了!`)}}
@@ -3829,7 +3829,7 @@ function progCard(){
 const H63=VIEWS.home;
 VIEWS.home=function(){const h=H63();if(!S.nick)return h;return h.replace('<div class="trail">',progCard()+'<div class="trail">')};
 const gateBar=()=>{const g=gateInfo();return `<div class="fb ${g.open?'ok':'no'}" style="margin:0 0 8px">${gateMsg(g)}${g.open?'':' <button class="btn ghost" data-a="go" data-v="home">去看學習進度</button>'}</div>`};
-['games','arena','fun8','shuo'].forEach(n=>{const f=VIEWS[n];VIEWS[n]=function(){return gateBar()+f()}});
+['games','arena','fun8'].forEach(n=>{const f=VIEWS[n];VIEWS[n]=function(){return gateBar()+f()}});
 VIEWS.lock=function(){
   const g=gateInfo();
   return `<div class="row">${back('home','道場')}<h2>🔒 先學習,再遊戲</h2></div>
@@ -3838,7 +3838,7 @@ VIEWS.lock=function(){
 };
 /* 遊戲開始前檢查門檻與局數 */
 let GAMEON=false;
-['arenaGo','sprintGo','survGo','memGo','shChain','shGuess','funGo'].forEach(n=>{
+['arenaGo','sprintGo','survGo','memGo','funGo'].forEach(n=>{
   const f=ACT[n];if(!f)return;
   ACT[n]=function(d){
     const g=gateInfo();
