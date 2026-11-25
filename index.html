@@ -4256,7 +4256,7 @@ ACT.zQuiz=d=>{
     resultView(Object.assign(s,{title:pass?`✅ ${zn}完成!`:'差一點點!',mood:pass?'cheer':'sad',msg:pass?`答對 ${s.ok}/${s.n},這個學習區完成了!`:`要答對 ${qp} 題才過關,回去看看再來,題目會重新抽。`,btns:pass?[{t:'回首頁看進度',a:'go',d:{v:'home'}}]:[{t:'🔁 再測一次',a:'zQuiz',d:{z:id}},{t:'去學習',a:'go',d:{v:id==='comics'?'comics':'study'},c:'ghost'}]}))}});
 };
 /* 各學習區頂端的進度卡 */
-['study','comics','shuo','tractor'].forEach(n=>{const f=VIEWS[n];if(!f)return;VIEWS[n]=function(){const h=f(),z=ZONES.find(x=>x.id===n);if(!S.nick||!z)return h;const card=`<section class="card q"><div class="row" style="justify-content:space-between"><b>本區進度</b>${zDone2(n)?'<span class="pill g">✅ 完成</span>':''}</div><div class="row" style="gap:6px;flex-wrap:wrap">${zItems(n).map(x=>`<span class="pill ${x[1]?'g':''}">${x[1]?'✅':'⬜'} ${x[0]}</span>`).join('')}<button class="btn" data-a="zQuiz">📝 去考綜合小測驗</button></div></section>`;const i=h.indexOf('</div>');return i<0?card+h:h.slice(0,i+6)+card+h.slice(i+6)}});
+['study','comics','shuo','tractor'].forEach(n=>{const f=VIEWS[n];if(!f)return;VIEWS[n]=function(){const h=f(),z=ZONES.find(x=>x.id===n);if(!S.nick||!z)return h;const card=`<section class="card q"><div class="row" style="justify-content:space-between"><b>本區進度</b>${zDone2(n)?'<span class="pill g">✅ 完成</span>':''}</div><div class="row" style="gap:6px;flex-wrap:wrap">${zItems(n).map(x=>`<span class="pill ${x[1]?'g':''}">${x[1]?'✅':'⬜'} ${x[0]}</span>`).join('')}<button class="btn" data-a="zQuiz" data-z="${n}">📝 去考小測驗</button></div></section>`;const i=h.indexOf('</div>');return i<0?card+h:h.slice(0,i+6)+card+h.slice(i+6)}});
 
 
 /* ===== v70:四個學習區合併成一份綜合小測驗 ===== */
@@ -4266,19 +4266,19 @@ zItems=function(id){const z=ZC();return [['綜合小測驗',z[ZFLAG[id]]?1:0]]};
 zUnits=function(){const z=ZC();return {d:Object.values(ZFLAG).filter(k=>z[k]).length,t:4}};
 zRow=function(z){
   const done=zDone2(z.id);
-  return `<div class="row" style="justify-content:space-between"><span>${z.e} ${z.n}</span><b>${done?'✅ 完成':'⬜ 還沒完成'}</b><button class="btn ghost" data-a="go" data-v="${z.v}">去學習</button></div>`;
+  return `<div class="row" style="justify-content:space-between"><span>${z.e} ${z.n}</span><b>${done?'✅ 完成':'⬜ 還沒完成'}</b><span class="row" style="gap:6px"><button class="btn ghost" data-a="go" data-v="${z.v}">去學習</button>${done?'':`<button class="btn" data-a="zQuiz" data-z="${z.id}">📝 小測驗</button>`}</span></div>`;
 };
 progCard=function(){
   const g=gateInfo(),u=zUnits(),R=RUL(),need=ZONES.filter(z=>!zDone2(z.id));
   return `<section class="card q"><h3>📋 本週學習進度 <span class="small mute">已完成 ${u.d}/${u.t} 個學習區</span></h3>${bar(u.d,u.t)}
   <div style="display:grid;gap:8px">${ZONES.map(zRow).join('')}</div>
-  ${need.length?`<button class="btn big" data-a="zQuiz">📝 綜合小測驗(${need.length*R.qn} 題,每區答對 ${Math.min(R.qp,R.qn)} 題算完成)</button><p class="small mute" style="margin:0">先在各區學習,再來考。只考還沒完成的區。</p>`:''}
+  ${need.length?`<p class="small mute" style="margin:0">每個區學完後,按旁邊的「小測驗」(${R.qn} 題,答對 ${Math.min(R.qp,R.qn)} 題算完成)。</p>`:''}
   <div class="fb ${g.open?'ok':'no'}" style="margin:8px 0 0">${gateMsg(g)}</div>
   <div class="row"><button class="btn ghost" data-a="go" data-v="rlog">📒 我的學習記錄(成績碼、列印簽單)</button></div></section>`;
 };
-ACT.zQuiz=function(){
-  const R=RUL(),qn=Math.max(1,R.qn),qp=Math.min(R.qp,qn),need=ZONES.filter(z=>!zDone2(z.id));
-  if(!need.length){toast('四個學習區都完成了!');return go('home')}
+ACT.zQuiz=function(d){
+  const R=RUL(),qn=Math.max(1,R.qn),qp=Math.min(R.qp,qn),need=ZONES.filter(z=>!zDone2(z.id)&&(!d||!d.z||z.id===d.z));
+  if(!need.length){toast('這個學習區已經完成了!');return go('home')}
   const sc=scopeWords(S.grade,S.les),used=new Set(),qs=[],meta=[];
   const KS={study:['mean','word','cloze'],comics:['cloze','use'],shuo:['shuo','shuo2'],tractor:['use','tf']};
   need.forEach(z=>{
@@ -4287,12 +4287,12 @@ ACT.zQuiz=function(){
       const ok=kindsFor(w,2).filter(k=>KS[z.id].includes(k));if(z.id==='shuo'&&SH[w]&&!ok.length)ok.push('shuo');if(!ok.length)continue;
       try{const q=mkQ(w,pick(ok,1)[0],2);q.stem=`【${z.e}${z.n}】`+q.stem;qs.push(q);meta.push(z.id);used.add(w);n++}catch(e){}}
   });
-  startRun({qs,title:`綜合小測驗(${qs.length} 題)`,src:'zq',onDone:res=>{
+  const ZQD=d&&d.z?{z:d.z}:{};startRun({qs,title:need.length===1?`${need[0].e}${need[0].n}小測驗(${qs.length} 題,答對 ${qp} 題算完成)`:`小測驗(${qs.length} 題)`,src:'zq',onDone:res=>{
     const lines=[],passed=[];
     need.forEach(z=>{const idx=meta.map((m,i)=>m===z.id?i:-1).filter(i=>i>=0),ok=idx.filter(i=>res[i]).length,pass=idx.length&&ok>=Math.min(qp,idx.length);
       if(pass){passed.push(z.id);zMark(ZFLAG[z.id])}lines.push(`${pass?'✅':'❌'} ${z.e}${z.n}:答對 ${ok}/${idx.length}`)});
-    const sm=summary('綜合小測驗',res),left=ZONES.filter(z=>!zDone2(z.id)),all=!left.length;
-    resultView(Object.assign(sm,{title:all?'🎉 四個學習區全部完成!':passed.length?'完成了一部分':'差一點點!',mood:all?'cheer':passed.length?'happy':'sad',lines:[`總共答對 <b>${sm.ok}/${sm.n}</b> 題`].concat(lines),msg:all?'遊戲解鎖了!':`還沒完成:${left.map(z=>z.e+z.n).join('、')}。回去學習後,再考一次(只會考還沒完成的區)。`,btns:all?[{t:'回首頁看進度',a:'go',d:{v:'home'}}]:[{t:'🔁 再考還沒完成的區',a:'zQuiz'},{t:'回首頁',a:'go',d:{v:'home'},c:'ghost'}]}))}});
+    const sm=summary('學習區小測驗',res),left=ZONES.filter(z=>!zDone2(z.id)),all=!left.length;
+    resultView(Object.assign(sm,{title:all?'🎉 四個學習區全部完成!':passed.length?`✅ ${need.length===1?need[0].n:'這幾區'}完成!`:'差一點點!',mood:all?'cheer':passed.length?'happy':'sad',lines:[`總共答對 <b>${sm.ok}/${sm.n}</b> 題`].concat(lines),msg:all?'遊戲解鎖了!':passed.length?`還沒完成:${left.map(z=>z.e+z.n).join('、')}。`:`要答對 ${qp} 題才算完成,回去學習後再考一次,題目會重新抽。`,btns:(all||passed.length)?[{t:'回首頁看進度',a:'go',d:{v:'home'}}]:[{t:'🔁 再考一次',a:'zQuiz',d:ZQD},{t:'回首頁',a:'go',d:{v:'home'},c:'ghost'}]}))}});
 };
 
 render();
