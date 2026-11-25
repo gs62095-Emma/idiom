@@ -1224,8 +1224,7 @@ VIEWS.card=function(){
   <p style="margin-top:12px"><b>完整意思:</b>${esc(e.m)}</p><p><b>例句:</b>${hl}</p>
   ${e.sy.length?`<p><b>意思像:</b>${e.sy.map(x=>`<span class="pill g">${esc(x)}</span>`).join(' ')}</p>`:''}
   ${e.an.length?`<p><b>意思反:</b>${e.an.map(x=>`<span class="pill r">${esc(x)}</span>`).join(' ')}</p>`:''}
-  ${e.ec?`<p class="small mute">小心寫錯:不要寫成「${esc(wrongForm(w))}」</p>`:''}
-  <button class="btn big" data-a="cardQuiz">考考我 ✍️</button></section>`;
+  ${e.ec?`<p class="small mute">小心寫錯:不要寫成「${esc(wrongForm(w))}」</p>`:''}</section>`;
 };
 ACT.say=()=>{const w=V.w,r=RICH[w];speak(w+'。字面上是:'+MN[w][0].replace(/=/g,'是').replace(/;/g,'。')+'。縮縮說:'+SH[w]+'。'+(r?r.story.join(''):'')+'意思是:'+D[w].m)};
 ACT.cardQuiz=()=>{const w=V.w,bk=V.back||'study';const qs=[mkQ(w,'shuo',2),mkQ(w,'cloze',2),KIND.build(w,1)];V.back=bk;
@@ -4293,6 +4292,31 @@ ACT.zQuiz=function(d){
       if(pass){passed.push(z.id);zMark(ZFLAG[z.id])}lines.push(`${pass?'✅':'❌'} ${z.e}${z.n}:答對 ${ok}/${idx.length}`)});
     const sm=summary('學習區小測驗',res),left=ZONES.filter(z=>!zDone2(z.id)),all=!left.length;
     resultView(Object.assign(sm,{title:all?'🎉 四個學習區全部完成!':passed.length?`✅ ${need.length===1?need[0].n:'這幾區'}完成!`:'差一點點!',mood:all?'cheer':passed.length?'happy':'sad',lines:[`總共答對 <b>${sm.ok}/${sm.n}</b> 題`].concat(lines),msg:all?'遊戲解鎖了!':passed.length?`還沒完成:${left.map(z=>z.e+z.n).join('、')}。`:`要答對 ${qp} 題才算完成,回去學習後再考一次,題目會重新抽。`,btns:(all||passed.length)?[{t:'回首頁看進度',a:'go',d:{v:'home'}}]:[{t:'🔁 再考一次',a:'zQuiz',d:ZQD},{t:'回首頁',a:'go',d:{v:'home'},c:'ghost'}]}))}});
+};
+
+
+/* ===== v75:整課看完,再做一次整課綜合「考考我」 ===== */
+const _idm=ACT.idiom;ACT.idiom=function(d){S.vw=S.vw||{};if(d&&d.w&&!S.vw[d.w]){S.vw[d.w]=1;save()}return _idm(d)};
+const lsWords=l=>((LES[S.grade]||{})[l]||[]).filter(w=>D[w]);
+const lsSeen=l=>{const ws=lsWords(l),v=S.vw||{};return {n:ws.filter(w=>v[w]).length,t:ws.length}};
+const _st75=VIEWS.study;
+VIEWS.study=function(){
+  let h=_st75();
+  LESSONS(S.grade).forEach(l=>{
+    const x=lsSeen(l),ok=x.n>=x.t&&x.t>0;
+    const row=`<div class="row" style="justify-content:space-between;margin:2px 0 6px">${ok?`<span class="small mute">這一課的成語都看過了 ✅</span><button class="btn" data-a="lsQuiz" data-l="${l}">📝 整課考考我</button>`:`<span class="small mute">先把這一課的成語都點開看過(${x.n}/${x.t}),才能考「整課考考我」</span>`}</div>`;
+    h=h.replace(`第 ${l} 課</h3>`,`第 ${l} 課</h3>`+row);
+  });
+  return h;
+};
+ACT.lsQuiz=function(d){
+  const l=+d.l,ws=shuffle(lsWords(l)).slice(0,12),x=lsSeen(l);
+  if(!ws.length)return;if(x.n<x.t){toast('先把這一課的成語都看過一遍。');return}
+  const KS=['mean','word','cloze','tf','syn','use'],qs=[];
+  ws.forEach(w=>{const ks=kindsFor(w,2).filter(k=>KS.includes(k));try{qs.push(mkQ(w,ks.length?pick(ks,1)[0]:'mean',2))}catch(e){}});
+  startRun({qs:shuffle(qs),title:`整課考考我:第 ${l} 課(${qs.length} 題)`,src:'learn',onDone:res=>{
+    const sm=summary('整課考考我',res);addXP(sm.ok*3);
+    resultView(Object.assign(sm,{title:sm.ok>=sm.n*.8?'整課都記住了!':'再看看這一課',msg:sm.ok>=sm.n*.8?'很棒!這一課的成語你掌握了。':'答錯的成語回去再看一下卡片,再考一次,題目會重新抽。',btns:[{t:'🔁 再考一次',a:'lsQuiz',d:{l}},{t:'回竹簡學堂',a:'go',d:{v:'study'},c:'ghost'}]}))}});
 };
 
 render();
