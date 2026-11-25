@@ -4160,6 +4160,41 @@ VIEWS.home=function(){
   return h.replace('<div class="trail">',`<section class="card" style="border-color:var(--gold)"><div class="row" style="justify-content:space-between"><b>⚔ 可以挑戰「${nx.n}」升等考驗!</b><button class="btn" data-a="go" data-v="promo">${cl?'繼續挑戰':'去挑戰'}</button></div><p class="small mute" style="margin:0">五關 + 大魔王${cl?`(已過 ${Math.min(cl,5)} 關)`:''}</p></section><div class="trail">`);
 };
 
+
+/* ===== v67:學習區記錄保留 7 天(從開始那天起算) ===== */
+const dDiff=(a,b)=>Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5);
+const dAdd=(k,n)=>{const d=new Date(k+'T00:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
+function WKS(){
+  const t=tdy();
+  if(!S.wk){const ks=Object.keys(S.dh||{}).filter(k=>{const dd=dDiff(k,t);return dd>=0&&dd<=6&&Object.values((S.dh[k].t)||{}).some(x=>x>0)}).sort();S.wk=ks[0]||t}
+  else if(dDiff(S.wk,t)>=7||dDiff(S.wk,t)<0)S.wk=t;
+  return S.wk;
+}
+function wkKeys(){const w=WKS();return [0,1,2,3,4,5,6].map(i=>dAdd(w,i))}
+const wkMin=(k,z)=>{const e=(S.dh||{})[k];return e&&e.t?(e.t[z]||0):0};
+const mdOf=k=>+k.slice(5,7)+'/'+ +k.slice(8,10);
+function zDoneDay(z){const R=RUL(),ks=wkKeys();return ks.find(k=>wkMin(k,z.id)>=R.min*60)||null}
+gateInfo=function(){
+  const R=RUL(),d=DL(),need=R.gate?ZONES.filter(z=>!zDoneDay(z)):[],left=Math.max(0,R.gm-d.g);
+  return {R,d,need,left,open:!need.length&&left>0};
+};
+gateMsg=function(g){
+  const ks=wkKeys(),rg=mdOf(ks[0])+'~'+mdOf(ks[6]);
+  if(g.need.length)return `🔒 這一週(${rg})還沒完成:${g.need.map(z=>z.e+z.n).join('、')}。每個學習區要有一天學滿 ${g.R.min} 分鐘,才能玩遊戲。`;
+  if(g.left<=0)return `🛑 今天的遊戲 ${g.R.gm} 局已經用完了,明天再玩!(想多練可以去修練或破綻簿)`;
+  return `🎮 這一週的學習區都完成了,遊戲已解鎖!今天還可以玩 ${g.left} 局。`;
+};
+progCard=function(){
+  const g=gateInfo(),R=g.R,ks=wkKeys(),t=tdy(),rg=mdOf(ks[0])+'~'+mdOf(ks[6]);
+  return `<section class="card q"><h3>📋 本週學習進度 <span class="small mute">${rg}</span></h3>
+  <div style="display:grid;gap:8px">${ZONES.map(z=>{const dd=zDoneDay(z),td=g.d.t[z.id]||0;
+    const dots=ks.map(k=>{const m=wkMin(k,z.id),ok=m>=R.min*60,fut=dDiff(t,k)>0;return `<span title="${mdOf(k)}:${mmss(m)}" style="display:inline-block;min-width:34px;text-align:center;font-size:.72rem;padding:2px 4px;border-radius:8px;border:1px solid ${k===t?'var(--gold)':'rgba(255,255,255,.25)'};opacity:${fut?.4:1};background:${ok?'rgba(63,167,90,.45)':m>0?'rgba(242,194,48,.25)':'transparent'}">${ok?'✓':m>0?Math.ceil(m/60)+'′':'·'}<br>${mdOf(k)}</span>`}).join(' ');
+    return `<div><div class="row" style="justify-content:space-between"><span>${z.e} ${z.n}</span><b>${dd?'✅ '+mdOf(dd)+' 完成':'⏱ 今天 '+mmss(td)+' / '+R.min+':00'}</b>${dd?'':`<button class="btn ghost" data-a="go" data-v="${z.v}">去學習</button>`}</div><div class="row" style="gap:3px;flex-wrap:wrap;margin-top:3px">${dots}</div></div>`}).join('')}</div>
+  <div class="fb ${g.open?'ok':'no'}" style="margin:8px 0 0">${gateMsg(g)}</div>
+  <div class="row"><button class="btn ghost" data-a="go" data-v="rlog">📒 我的學習記錄(成績碼、列印簽單)</button></div></section>`;
+};
+if(S&&S.nick){WKS();save()}
+
 render();
 (async()=>{try{if(window.claude&&claude.use){const t=await claude.use('tts');if(t)window.TTS=t}}catch(e){}})();
 </script>
