@@ -1339,7 +1339,7 @@ ACT.trCheck=()=>{
   const T=TR;T.tries++;let bad=0;
   T.slots.forEach((ci,k)=>{if(T.locked[k])return;const ok=T.bank[ci]===T.ans[k];if(T.first[k]==null){T.first[k]=ok;rec({w:T.ans[k],t:'tractor',sk:'apply',oc:[]},ok,-1,'tractor')}
     if(ok)T.locked[k]=true;else{bad++;T.slots[k]=null}});
-  if(!bad){T.fin=true;const clean=T.first.every(Boolean);let g;if(T.comic){const k=CKEY(T.comic),isNew=!S.cdone[k];S.cdone[k]=1;g=isNew?15+3*T.ans.length+(clean?10:0):4}else{const isNew=!S.done[T.i];S.done[T.i]=1;g=isNew?10+5*T.ans.length+(clean?5:0):3}addXP(g);T.msg=`+${g} XP${clean?'(一次全對,額外獎勵!)':''}`}
+  if(!bad){T.fin=true;typeof zMark==='function'&&!T.comic&&zMark('tr',T.i);const clean=T.first.every(Boolean);let g;if(T.comic){const k=CKEY(T.comic),isNew=!S.cdone[k];S.cdone[k]=1;g=isNew?15+3*T.ans.length+(clean?10:0):4}else{const isNew=!S.done[T.i];S.done[T.i]=1;g=isNew?10+5*T.ans.length+(clean?5:0):3}addXP(g);T.msg=`+${g} XP${clean?'(一次全對,額外獎勵!)':''}`}
   else T.msg=`有 ${bad} 格還不對,已經退回成語箱。看看句子的意思,或按「縮縮說提示」!`;
   render();
 };
@@ -3789,7 +3789,7 @@ function fmFinish(win){
 
 
 /* ===== v63:學習門檻、每日遊戲局數、成績碼 ===== */
-const RUL=()=>Object.assign({min:5,gm:6,gate:1},store.get('cy2_rules',{}));
+const RUL=()=>Object.assign({min:5,gm:6,gate:1,qn:5,qp:4,tn:2},store.get('cy2_rules',{}));
 const p2=n=>String(n).padStart(2,'0');
 const tdy=()=>{const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
 function DL(){S.dh=S.dh||{};const k=tdy();if(!S.dh[k]){S.dh[k]={t:{},g:0};const ks=Object.keys(S.dh).sort();while(ks.length>45)delete S.dh[ks.shift()]}return S.dh[k]}
@@ -3925,12 +3925,12 @@ let RUNLOCK=false,RUMSG='';
 const ST63=VIEWS.settings;
 VIEWS.settings=function(){
   const R=RUL();
-  const body=RUNLOCK?`<label class="f">每個學習區每天要學幾分鐘<input type="number" id="ru-min" min="0" max="60" value="${R.min}"></label><label class="f">遊戲每天合計幾局<input type="number" id="ru-gm" min="0" max="50" value="${R.gm}"></label><label class="row"><input type="checkbox" id="ru-gate" ${R.gate?'checked':''}> 要先完成學習區,才能玩遊戲</label><div class="row"><button class="btn" data-a="ruSave">儲存規則</button><button class="btn ghost" data-a="ruLock">鎖起來</button></div>`:`<p class="small mute" style="margin:0">目前:每區 ${R.min} 分鐘、遊戲每天 ${R.gm} 局、${R.gate?'要先學習才能玩遊戲':'不鎖遊戲'}。要修改請輸入老師密碼。</p><div class="row"><input type="password" id="ru-pw" inputmode="numeric" placeholder="老師密碼" style="max-width:180px"><button class="btn ghost" data-a="ruUnlock">解鎖</button></div>`;
+  const body=RUNLOCK?`<label class="f">竹簡學堂、漫畫的小測驗題數<input type="number" id="ru-qn" min="1" max="10" value="${R.qn}"></label><label class="f">小測驗答對幾題才過關<input type="number" id="ru-qp" min="1" max="10" value="${R.qp}"></label><label class="f">成語拖拉機要完成幾篇<input type="number" id="ru-tn" min="1" max="10" value="${R.tn}"></label><label class="f">遊戲每天合計幾局<input type="number" id="ru-gm" min="0" max="50" value="${R.gm}"></label><label class="row"><input type="checkbox" id="ru-gate" ${R.gate?'checked':''}> 要先完成學習區,才能玩遊戲</label><div class="row"><button class="btn" data-a="ruSave">儲存規則</button><button class="btn ghost" data-a="ruLock">鎖起來</button></div>`:`<p class="small mute" style="margin:0">目前:小測驗 ${R.qn} 題答對 ${R.qp} 題過關、拖拉機 ${R.tn} 篇、遊戲每天 ${R.gm} 局、${R.gate?'要先學習才能玩遊戲':'不鎖遊戲'}。要修改請輸入老師密碼。</p><div class="row"><input type="password" id="ru-pw" inputmode="numeric" placeholder="老師密碼" style="max-width:180px"><button class="btn ghost" data-a="ruUnlock">解鎖</button></div>`;
   return ST63()+`<section class="card q"><h3>👩‍🏫 學習規則(老師設定)</h3>${body}${RUMSG?`<div class="fb ok" role="status" style="margin:0">${esc(RUMSG)}</div>`:''}<p class="small mute" style="margin:0">規則存在這台裝置上。</p></section>`;
 };
 ACT.ruUnlock=()=>{if((($('#ru-pw')||{}).value||'').trim()===TPW){RUNLOCK=true;RUMSG=''}else RUMSG='密碼不對。';render()};
 ACT.ruLock=()=>{RUNLOCK=false;RUMSG='';render()};
-ACT.ruSave=()=>{const c=(id,lo,hi,df)=>{const v=parseInt(($(id)||{}).value,10);return isNaN(v)?df:Math.max(lo,Math.min(hi,v))};store.set('cy2_rules',{min:c('#ru-min',0,60,5),gm:c('#ru-gm',0,50,6),gate:($('#ru-gate')||{}).checked?1:0});RUMSG='已儲存。';render()};
+ACT.ruSave=()=>{const c=(id,lo,hi,df)=>{const v=parseInt(($(id)||{}).value,10);return isNaN(v)?df:Math.max(lo,Math.min(hi,v))};store.set('cy2_rules',{qn:c('#ru-qn',1,10,5),qp:c('#ru-qp',1,10,4),tn:c('#ru-tn',1,10,2),gm:c('#ru-gm',0,50,6),gate:($('#ru-gate')||{}).checked?1:0});RUMSG='已儲存。';render()};
 /* 老師端:匯入學生練習成績碼、全班彙整 */
 const pSc=()=>store.get('cy2_pscore',{});
 async function pAdd(c){
@@ -4194,6 +4194,69 @@ progCard=function(){
   <div class="row"><button class="btn ghost" data-a="go" data-v="rlog">📒 我的學習記錄(成績碼、列印簽單)</button></div></section>`;
 };
 if(S&&S.nick){WKS();save()}
+
+
+/* ===== v69:學習區改用「完成度」,不再用時間 ===== */
+function ZC(){WKS();if(!S.zc||S.zc.w!==S.wk)S.zc={w:S.wk,study:0,comics:0,cards:0,match:0,guess:0,tr:[]};S.zc.tr=S.zc.tr||[];return S.zc}
+const ZNAME={study:'竹簡學堂小測驗',comics:'漫畫小測驗',cards:'縮縮說卡',match:'縮縮說配對',guess:'猜成語一輪',tr:'成語拖拉機'};
+function zMark(k,key){
+  const z=ZC();if(k==='tr'){if(key==null||z.tr.includes(key))return;z.tr.push(key);save();toast(`📜 拖拉機完成 ${Math.min(z.tr.length,RUL().tn)}/${RUL().tn} 篇`);return}
+  if(z[k])return;z[k]=1;save();toast(`✅ 完成:${ZNAME[k]}`);
+}
+function zItems(id){
+  const z=ZC(),R=RUL();
+  if(id==='study')return [['小測驗',z.study]];
+  if(id==='comics')return [['小測驗',z.comics]];
+  if(id==='shuo')return [['縮縮說卡',z.cards],['配對',z.match],['猜成語',z.guess]];
+  return [[`完成 ${R.tn} 篇(${Math.min(z.tr.length,R.tn)}/${R.tn})`,z.tr.length>=R.tn?1:0]];
+}
+const zDone2=id=>zItems(id).every(x=>x[1]);
+function zUnits(){const z=ZC(),R=RUL();return {d:(z.study?1:0)+(z.comics?1:0)+(z.cards?1:0)+(z.match?1:0)+(z.guess?1:0)+Math.min(z.tr.length,R.tn),t:5+R.tn}}
+gateInfo=function(){const R=RUL(),d=DL(),need=R.gate?ZONES.filter(z=>!zDone2(z.id)):[],left=Math.max(0,R.gm-d.g);return {R,d,need,left,open:!need.length&&left>0}};
+gateMsg=function(g){
+  if(g.need.length)return `🔒 還沒完成:${g.need.map(z=>z.e+z.n).join('、')}。4 個學習區都完成,才能玩遊戲。`;
+  if(g.left<=0)return `🛑 今天的遊戲 ${g.R.gm} 局已經用完了,明天再玩!(想多練可以去修練或破綻簿)`;
+  return `🎮 學習區都完成了,遊戲已解鎖!今天還可以玩 ${g.left} 局。`;
+};
+function zRow(z){
+  const done=zDone2(z.id),its=zItems(z.id);
+  return `<div><div class="row" style="justify-content:space-between"><span>${z.e} ${z.n}</span><b>${done?'✅ 完成':'進行中'}</b><span class="row" style="gap:6px">${(z.id==='study'||z.id==='comics')?`<button class="btn ghost" data-a="zQuiz" data-z="${z.id}">📝 小測驗</button>`:''}<button class="btn ghost" data-a="go" data-v="${z.v}">去學習</button></span></div>
+  <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:3px">${its.map(x=>`<span class="pill ${x[1]?'g':''}">${x[1]?'✅':'⬜'} ${x[0]}</span>`).join('')}</div></div>`;
+}
+progCard=function(){
+  const g=gateInfo(),u=zUnits();
+  return `<section class="card q"><h3>📋 本週學習進度 <span class="small mute">已完成 ${u.d}/${u.t}</span></h3>${bar(u.d,u.t)}
+  <div style="display:grid;gap:10px">${ZONES.map(zRow).join('')}</div>
+  <div class="fb ${g.open?'ok':'no'}" style="margin:8px 0 0">${gateMsg(g)}</div>
+  <div class="row"><button class="btn ghost" data-a="go" data-v="rlog">📒 我的學習記錄(成績碼、列印簽單)</button></div></section>`;
+};
+function zTick(){
+  let el=document.getElementById('ztimer');if(!el){el=document.createElement('div');el.id='ztimer';el.setAttribute('role','status');document.body.appendChild(el)}
+  const z=S&&S.nick&&(VZ[V.v]||(V.v==='run'&&RUN&&RUN.src==='shuo'&&!RUN.game?'shuo':null));
+  if(!z){el.style.display='none';document.body.classList.remove('zt');return}
+  const zz=ZONES.find(x=>x.id===z),d=DL(),act=document.visibilityState==='visible'&&Date.now()-LACT<45000;
+  if(act){d.t[z]=(d.t[z]||0)+1;if(d.t[z]%10===0)save()}
+  const g=gateInfo(),u=zUnits(),its=zItems(z);
+  el.style.display='block';document.body.classList.add('zt');
+  el.innerHTML=`${zz.e} ${zz.n}:${its.map(x=>(x[1]?'✅':'⬜')+x[0]).join(' ')}<br><span class="${g.need.length?'zr':'zd'}">${g.need.length?'本週進度 '+u.d+'/'+u.t+',還沒完成:'+g.need.map(x=>x.e+x.n).join('、'):'學習區全部完成!'}</span>`;
+}
+/* 事件掛鉤 */
+const _cknow=ACT.cknow;ACT.cknow=function(){_cknow();if(CARD&&!CARD.q.length)zMark('cards')};
+const _mt=mTry;mTry=function(){_mt();if(MT&&MT.done&&MT.done.length===MT.L.length)zMark('match')};
+const _sr2=startRun;startRun=function(cfg){if(cfg&&cfg.title==='看縮縮說猜成語'&&cfg.onDone){const od=cfg.onDone;cfg.onDone=function(res,r){zMark('guess');return od(res,r)}}return _sr2(cfg)};
+/* 小測驗 */
+function comicWords(){const rd=Object.keys(S.cread||{}),all=[],read=[];COMICS.filter(c=>c.g===S.grade).forEach(c=>{const ws=[];c.p.forEach(p=>{(p[0].match(/\{([^}]+)\}/g)||[]).forEach(x=>{const w=x.slice(1,-1);if(D[w]&&!ws.includes(w))ws.push(w)})});ws.forEach(w=>{if(!all.includes(w))all.push(w);if(rd.includes(CKEY(c))&&!read.includes(w))read.push(w)})});return read.length>=5?read:all}
+ACT.zQuiz=d=>{
+  const id=d.z,R=RUL(),qn=Math.max(1,R.qn),qp=Math.min(R.qp,qn);
+  const ws=shuffle(id==='comics'?comicWords():scopeWords(S.grade,S.les)).slice(0,qn),ks=id==='comics'?['cloze','use','tf','mean']:['mean','word','cloze','tf','syn'];
+  const qs=ws.map(w=>{const ok=kindsFor(w,2).filter(k=>ks.includes(k));return mkQ(w,ok.length?pick(ok,1)[0]:'mean',2)});
+  const zn=id==='comics'?'漫畫翻翻書':'竹簡學堂';
+  startRun({qs,title:`${zn}小測驗(答對 ${qp}/${qs.length} 過關)`,src:'zq',onDone:res=>{
+    const s=summary(zn+'小測驗',res),pass=s.ok>=Math.min(qp,qs.length);if(pass)zMark(id);
+    resultView(Object.assign(s,{title:pass?`✅ ${zn}完成!`:'差一點點!',mood:pass?'cheer':'sad',msg:pass?`答對 ${s.ok}/${s.n},這個學習區完成了!`:`要答對 ${qp} 題才過關,回去看看再來,題目會重新抽。`,btns:pass?[{t:'回首頁看進度',a:'go',d:{v:'home'}}]:[{t:'🔁 再測一次',a:'zQuiz',d:{z:id}},{t:'去學習',a:'go',d:{v:id==='comics'?'comics':'study'},c:'ghost'}]}))}});
+};
+/* 各學習區頂端的進度卡 */
+['study','comics','shuo','tractor'].forEach(n=>{const f=VIEWS[n];if(!f)return;VIEWS[n]=function(){const h=f(),z=ZONES.find(x=>x.id===n);if(!S.nick||!z)return h;const card=`<section class="card q"><div class="row" style="justify-content:space-between"><b>本區進度</b>${zDone2(n)?'<span class="pill g">✅ 完成</span>':''}</div><div class="row" style="gap:6px;flex-wrap:wrap">${zItems(n).map(x=>`<span class="pill ${x[1]?'g':''}">${x[1]?'✅':'⬜'} ${x[0]}</span>`).join('')}${(n==='study'||n==='comics')?`<button class="btn" data-a="zQuiz" data-z="${n}">📝 去考小測驗</button>`:''}</div></section>`;const i=h.indexOf('</div>');return i<0?card+h:h.slice(0,i+6)+card+h.slice(i+6)}});
 
 render();
 (async()=>{try{if(window.claude&&claude.use){const t=await claude.use('tts');if(t)window.TTS=t}}catch(e){}})();
