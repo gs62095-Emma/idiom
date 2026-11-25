@@ -3788,7 +3788,7 @@ function fmFinish(win){
 
 
 /* ===== v63:學習門檻、每日遊戲局數、成績碼 ===== */
-const RUL=()=>Object.assign({min:5,gm:6,gate:1,qn:3,qp:2,tn:2},store.get('cy2_rules',{}));
+const RUL=()=>Object.assign({min:5,gm:6,gate:1,qn:3,qp:2,tn:2,mw:2},store.get('cy2_rules',{}));
 const p2=n=>String(n).padStart(2,'0');
 const tdy=()=>{const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
 function DL(){S.dh=S.dh||{};const k=tdy();if(!S.dh[k]){S.dh[k]={t:{},g:0};const ks=Object.keys(S.dh).sort();while(ks.length>45)delete S.dh[ks.shift()]}return S.dh[k]}
@@ -3924,12 +3924,12 @@ let RUNLOCK=false,RUMSG='';
 const ST63=VIEWS.settings;
 VIEWS.settings=function(){
   const R=RUL();
-  const body=RUNLOCK?`<label class="f">綜合小測驗:每個學習區幾題<input type="number" id="ru-qn" min="1" max="10" value="${R.qn}"></label><label class="f">每個學習區要答對幾題才算完成<input type="number" id="ru-qp" min="1" max="10" value="${R.qp}"></label><label class="f">遊戲每天合計幾局<input type="number" id="ru-gm" min="0" max="50" value="${R.gm}"></label><label class="row"><input type="checkbox" id="ru-gate" ${R.gate?'checked':''}> 要先完成學習區,才能玩遊戲</label><div class="row"><button class="btn" data-a="ruSave">儲存規則</button><button class="btn ghost" data-a="ruLock">鎖起來</button></div>`:`<p class="small mute" style="margin:0">目前:綜合小測驗每區 ${R.qn} 題、答對 ${R.qp} 題算完成、遊戲每天 ${R.gm} 局、${R.gate?'要先學習才能玩遊戲':'不鎖遊戲'}。要修改請輸入老師密碼。</p><div class="row"><input type="password" id="ru-pw" inputmode="numeric" placeholder="老師密碼" style="max-width:180px"><button class="btn ghost" data-a="ruUnlock">解鎖</button></div>`;
+  const body=RUNLOCK?`<label class="f">小測驗最多可以錯幾題(題數 = 該課成語數)<input type="number" id="ru-mw" min="0" max="10" value="${R.mw}"></label><label class="f">遊戲每天合計幾局<input type="number" id="ru-gm" min="0" max="50" value="${R.gm}"></label><label class="row"><input type="checkbox" id="ru-gate" ${R.gate?'checked':''}> 要先完成學習區,才能玩遊戲</label><div class="row"><button class="btn" data-a="ruSave">儲存規則</button><button class="btn ghost" data-a="ruLock">鎖起來</button></div>`:`<p class="small mute" style="margin:0">目前:小測驗題數=該課成語數、最多錯 ${R.mw} 題、遊戲每天 ${R.gm} 局、${R.gate?'要先學習才能玩遊戲':'不鎖遊戲'}。要修改請輸入老師密碼。</p><div class="row"><input type="password" id="ru-pw" inputmode="numeric" placeholder="老師密碼" style="max-width:180px"><button class="btn ghost" data-a="ruUnlock">解鎖</button></div>`;
   return ST63()+`<section class="card q"><h3>👩‍🏫 學習規則(老師設定)</h3>${body}${RUMSG?`<div class="fb ok" role="status" style="margin:0">${esc(RUMSG)}</div>`:''}<p class="small mute" style="margin:0">規則存在這台裝置上。</p></section>`;
 };
 ACT.ruUnlock=()=>{if((($('#ru-pw')||{}).value||'').trim()===TPW){RUNLOCK=true;RUMSG=''}else RUMSG='密碼不對。';render()};
 ACT.ruLock=()=>{RUNLOCK=false;RUMSG='';render()};
-ACT.ruSave=()=>{const c=(id,lo,hi,df)=>{const v=parseInt(($(id)||{}).value,10);return isNaN(v)?df:Math.max(lo,Math.min(hi,v))};store.set('cy2_rules',{qn:c('#ru-qn',1,10,5),qp:c('#ru-qp',1,10,4),tn:c('#ru-tn',1,10,2),gm:c('#ru-gm',0,50,6),gate:($('#ru-gate')||{}).checked?1:0});RUMSG='已儲存。';render()};
+ACT.ruSave=()=>{const c=(id,lo,hi,df)=>{const v=parseInt(($(id)||{}).value,10);return isNaN(v)?df:Math.max(lo,Math.min(hi,v))};store.set('cy2_rules',{mw:c('#ru-mw',0,10,2),gm:c('#ru-gm',0,50,6),gate:($('#ru-gate')||{}).checked?1:0});RUMSG='已儲存。';render()};
 /* 老師端:匯入學生練習成績碼、全班彙整 */
 const pSc=()=>store.get('cy2_pscore',{});
 async function pAdd(c){
@@ -4271,7 +4271,7 @@ progCard=function(){
   const g=gateInfo(),u=zUnits(),R=RUL(),need=ZONES.filter(z=>!zDone2(z.id));
   return `<section class="card q"><h3>📋 本週學習進度 <span class="small mute">已完成 ${u.d}/${u.t} 個學習區</span></h3>${bar(u.d,u.t)}
   <div style="display:grid;gap:8px">${ZONES.map(zRow).join('')}</div>
-  ${need.length?`<p class="small mute" style="margin:0">每個區學完後,按旁邊的「小測驗」(${R.qn} 題,答對 ${Math.min(R.qp,R.qn)} 題算完成)。</p>`:''}
+  ${need.length?`<p class="small mute" style="margin:0">每個區學完後,按旁邊的「小測驗」(這一課有幾個成語就考幾題,最多只能錯 ${R.mw} 題)。</p>`:''}
   <div class="fb ${g.open?'ok':'no'}" style="margin:8px 0 0">${gateMsg(g)}</div>
   <div class="row"><button class="btn ghost" data-a="go" data-v="rlog">📒 我的學習記錄(成績碼、列印簽單)</button></div></section>`;
 };
@@ -4356,6 +4356,26 @@ VIEWS.study=function(){
     h+=`<p class="small mute">目前只顯示你選的範圍。想看整個${GR[S.grade]},把上面的「範圍」改成「整個${GR[S.grade]}」。</p>`;
   }
   return h;
+};
+
+
+/* ===== v78:小測驗題數 = 該課成語數,最多錯 2 題 ===== */
+ACT.zQuiz=function(d){
+  const R=RUL(),mw=Math.max(0,R.mw);const z=ZONES.find(x=>x.id===(d&&d.z));
+  if(!z)return;
+  if(zDone2(z.id)){toast('這個學習區已經完成了!');return go('home')}
+  if(!S.les){toast('請先在「我要學的範圍」選一課,再做小測驗。');return}
+  const ws=shuffle(lsWords(S.les));if(!ws.length)return;
+  const KS={study:['mean','word','cloze','tf','syn'],comics:['cloze','use','tf','mean'],shuo:['shuo','shuo2'],tractor:['use','tf']}[z.id],qs=[];
+  ws.forEach(w=>{const ok=kindsFor(w,2).filter(k=>KS.includes(k));if(z.id==='shuo'&&SH[w]&&!ok.length)ok.push('shuo');
+    try{const q=mkQ(w,ok.length?pick(ok,1)[0]:'mean',2);q.stem=`【${z.e}${z.n}】`+q.stem;qs.push(q)}catch(e){}});
+  startRun({qs,title:`${z.e}${z.n}小測驗:第 ${S.les} 課(${qs.length} 題,最多錯 ${mw} 題)`,src:'zq',onDone:res=>{
+    const sm=summary(z.n+'小測驗',res),bad=sm.n-sm.ok,pass=bad<=mw;if(pass)zMark(ZFLAG[z.id]);
+    const left=ZONES.filter(x=>!zDone2(x.id));
+    resultView(Object.assign(sm,{title:pass?`✅ ${z.n}完成!`:'還沒達成,再來一次!',mood:pass?'cheer':'sad',
+      lines:[`答對 <b>${sm.ok}/${sm.n}</b> 題,錯了 <b>${bad}</b> 題(最多只能錯 ${mw} 題)`],
+      msg:pass?(left.length?`還沒完成:${left.map(x=>x.e+x.n).join('、')}。`:'四個學習區都完成了,遊戲解鎖!'):`錯太多了,請回去再學一遍這一課,再重做一次。題目會重新抽。`,
+      btns:pass?[{t:'回首頁看進度',a:'go',d:{v:'home'}}]:[{t:'📖 回去再學一遍',a:'go',d:{v:z.v},c:'ghost'},{t:'🔁 重做一次',a:'zQuiz',d:{z:z.id}}]}))}});
 };
 
 render();
