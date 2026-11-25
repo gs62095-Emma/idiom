@@ -4320,18 +4320,31 @@ ACT.lsQuiz=function(d){
 };
 
 
-/* ===== v76:成語卡「上一個/下一個」 ===== */
-function cardSeq(w){const e=D[w];if(!e)return {a:[],i:-1};const g=e.g,a=LESSONS(g).flatMap(l=>(LES[g][l]||[]).filter(x=>D[x]));return {a,i:a.indexOf(w)}}
+/* ===== v76/79:成語卡「上一個/下一個」(依所在課別,處理同一成語出現在多課) ===== */
+let CLC=null;
+function cardSeq(w,lc){
+  const e=D[w];if(!e)return {a:[],i:-1};const g=(LES[S.grade]&&Object.values(LES[S.grade]).some(l=>l.includes(w)))?S.grade:e.g;
+  const a=LESSONS(g).flatMap(l=>(LES[g][l]||[]).filter(x=>D[x]).map(x=>({l,w:x})));
+  let i=lc?a.findIndex(o=>o.l===+lc&&o.w===w):-1;if(i<0)i=a.findIndex(o=>o.w===w);
+  return {a,i,g};
+}
 const _cd76=VIEWS.card;
 VIEWS.card=function(){
-  const h=_cd76();if(!V.w||!D[V.w])return h;
-  const q=cardSeq(V.w);if(q.i<0)return h;
-  const nx=q.a[q.i+1],pv=q.a[q.i-1],e=D[V.w];
-  return h+`<div class="row" style="justify-content:space-between;margin-top:8px;gap:8px">${pv?`<button class="btn ghost" data-a="cardGo" data-w="${esc(pv)}">← 上一個</button>`:'<span></span>'}<span class="small mute">第${e.l}課 · ${q.i+1}/${q.a.length}</span>${nx?`<button class="btn big" data-a="cardGo" data-w="${esc(nx)}">下一個 →</button>`:`<button class="btn" data-a="go" data-v="${V.back||'study'}">回列表</button>`}</div>`;
+  let h=_cd76();if(!V.w||!D[V.w])return h;
+  const q=cardSeq(V.w,CLC);if(q.i<0)return h;
+  const cur=q.a[q.i],nx=q.a[q.i+1],pv=q.a[q.i-1],e=D[V.w],ll=cur.l;
+  if(ll!==e.l||q.g!==e.g)h=h.replace(`${GR[e.g]} 第${e.l}課</span>`,`${GR[q.g]} 第${ll}課</span>`);
+  const btn=(o,t,c)=>`<button class="btn ${c}" data-a="cardGo" data-w="${esc(o.w)}" data-l="${o.l}">${t}</button>`;
+  return h+`<div class="row" style="justify-content:space-between;margin-top:8px;gap:8px">${pv?btn(pv,'← 上一個','ghost'):'<span></span>'}<span class="small mute">第${ll}課 · ${q.i+1}/${q.a.length}</span>${nx?btn(nx,'下一個 →','big'):`<button class="btn" data-a="go" data-v="${V.back||'study'}">回列表</button>`}</div>`;
 };
-ACT.cardGo=d=>{const b=V.back||'study';ACT.idiom({w:d.w});V.back=b;render();try{window.scrollTo(0,0)}catch(e){}};
-
-
+const _idm79=ACT.idiom;
+ACT.idiom=function(d){CLC=d&&d.l?+d.l:null;return _idm79(d)};
+ACT.cardGo=d=>{const b=V.back||'study';ACT.idiom({w:d.w,l:d.l});V.back=b;render();try{window.scrollTo(0,0)}catch(e){}};
+const _st79=VIEWS.study;
+VIEWS.study=function(){
+  const h=_st79(),parts=h.split('<section class="card isle">');
+  return parts[0]+parts.slice(1).map(p=>{const m=p.match(/第 (\d+) 課<\/h3>/);return '<section class="card isle">'+(m?p.split('data-a="idiom"').join(`data-a="idiom" data-l="${m[1]}"`):p)}).join('');
+};
 /* ===== v77:學生自選年級、課別,學習與小測驗對應 ===== */
 const _pc77=progCard;
 progCard=function(){
