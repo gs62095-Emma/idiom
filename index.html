@@ -4266,7 +4266,7 @@ zItems=function(id){const z=ZC();return [['綜合小測驗',z[ZFLAG[id]]?1:0]]};
 zUnits=function(){const z=ZC();return {d:Object.values(ZFLAG).filter(k=>z[k]).length,t:4}};
 zRow=function(z){
   const done=zDone2(z.id);
-  return `<div class="row" style="justify-content:space-between"><span>${z.e} ${z.n}</span><b>${done?'✅ 完成':'⬜ 還沒完成'}</b><span class="row" style="gap:6px"><button class="btn ghost" data-a="go" data-v="${z.v}">去學習</button>${done?'':`<button class="btn" data-a="zQuiz" data-z="${z.id}">📝 小測驗</button>`}</span></div>`;
+  return `<div class="row" style="justify-content:space-between"><span>${z.e} ${z.n}</span><b>${done?'✅ 已完成':'⬜ 還沒完成'}</b><span class="row" style="gap:6px"><button class="btn ghost" data-a="go" data-v="${z.v}">去學習</button>${done?'':`<button class="btn" data-a="zQuiz" data-z="${z.id}">📝 小測驗</button>`}</span></div>`;
 };
 progCard=function(){
   const g=gateInfo(),u=zUnits(),R=RUL(),need=ZONES.filter(z=>!zDone2(z.id));
