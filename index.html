@@ -4319,6 +4319,18 @@ ACT.lsQuiz=function(d){
     resultView(Object.assign(sm,{title:sm.ok>=sm.n*.8?'整課都記住了!':'再看看這一課',msg:sm.ok>=sm.n*.8?'很棒!這一課的成語你掌握了。':'答錯的成語回去再看一下卡片,再考一次,題目會重新抽。',btns:[{t:'🔁 再考一次',a:'lsQuiz',d:{l}},{t:'回竹簡學堂',a:'go',d:{v:'study'},c:'ghost'}]}))}});
 };
 
+
+/* ===== v76:成語卡「上一個/下一個」 ===== */
+function cardSeq(w){const e=D[w];if(!e)return {a:[],i:-1};const g=e.g,a=LESSONS(g).flatMap(l=>(LES[g][l]||[]).filter(x=>D[x]));return {a,i:a.indexOf(w)}}
+const _cd76=VIEWS.card;
+VIEWS.card=function(){
+  const h=_cd76();if(!V.w||!D[V.w])return h;
+  const q=cardSeq(V.w);if(q.i<0)return h;
+  const nx=q.a[q.i+1],pv=q.a[q.i-1],e=D[V.w];
+  return h+`<div class="row" style="justify-content:space-between;margin-top:8px;gap:8px">${pv?`<button class="btn ghost" data-a="cardGo" data-w="${esc(pv)}">← 上一個</button>`:'<span></span>'}<span class="small mute">第${e.l}課 · ${q.i+1}/${q.a.length}</span>${nx?`<button class="btn big" data-a="cardGo" data-w="${esc(nx)}">下一個 →</button>`:`<button class="btn" data-a="go" data-v="${V.back||'study'}">回列表</button>`}</div>`;
+};
+ACT.cardGo=d=>{const b=V.back||'study';ACT.idiom({w:d.w});V.back=b;render();try{window.scrollTo(0,0)}catch(e){}};
+
 render();
 (async()=>{try{if(window.claude&&claude.use){const t=await claude.use('tts');if(t)window.TTS=t}}catch(e){}})();
 </script>
