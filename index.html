@@ -4057,7 +4057,7 @@ VIEWS.tlog=function(){
   <div class="row"><label class="row"><input type="checkbox" id="tl-wl" ${TL.wl?'checked':''}> 成語清單</label><label class="row"><input type="checkbox" id="tl-self" ${TL.self?'checked':''}> 自評/心得欄</label><label class="row"><input type="checkbox" id="tl-sig" ${TL.sig?'checked':''}> 簽名欄</label><button class="btn ghost" data-a="tlApply">更新預覽</button></div>
   <div class="row"><button class="btn big" data-a="tlPrint">🖨 列印(或另存成 PDF)</button><button class="btn" data-a="tlDocx">📄 下載 Word(.docx)</button><button class="btn ghost" data-a="tlHtml">🌐 下載可列印網頁</button></div>
   ${TLMSG?`<div class="notice" role="status">${esc(TLMSG)}</div>`:''}</section>
-  <div class="paperwrap" style="overflow-x:auto;max-width:100%"><style>${LGCSS}.paperwrap .lg{min-width:680px}</style>${lgHtml(m)}</div>`;
+  <div class="paperwrap" id="paperwrap" style="overflow-x:auto;max-width:100%"><style>${LGCSS}.paperwrap .lg{min-width:680px}@media print{html,body{background:#fff!important;height:auto!important;min-height:0!important}.paperwrap .lg{min-width:0!important;padding:0!important;max-width:none!important}}</style>${lgHtml(m)}</div>`;
 };
 ACT.tlBack=()=>{tlSync();go('teacher')};
 ACT.tlApply=()=>{tlSync();TLMSG='';render()};
